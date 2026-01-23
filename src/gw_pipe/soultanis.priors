@@ -1,0 +1,30 @@
+A_peak = bilby.core.prior.Uniform(-22, -19, name="A_peak", latex_label="$A_peak$")
+A_1 = bilby.core.prior.Uniform(-22, -19, name="A_1", latex_label="$A_1$")
+A_2 = bilby.core.prior.Uniform(-22, -19, name="A_2", latex_label="$A_2$")
+A_3 = bilby.core.prior.Uniform(-22, -19, name="A_3", latex_label="$A_3$")
+t_peak = bilby.core.prior.Uniform(0.9, 1.2, name="t_peak", latex_label="$t_peak$")
+t_1 = bilby.core.prior.Uniform(3.5, 4.2, name="t_1", latex_label="$t_1$")
+t_2 = bilby.core.prior.Uniform(7.8, 8.5, name="t_2", latex_label="$t_2$")
+t_3 = bilby.core.prior.Uniform(1, 10, name="t_3", latex_label="$t_3$")
+phi_peak = bilby.core.prior.Uniform(-3.14, 3.14, name="phi_peak", latex_label="$phi_peak$")
+phi_1 = bilby.core.prior.Uniform(-3.14, 3.14, name="phi_1", latex_label="$phi_1$")
+phi_2 = bilby.core.prior.Uniform(-3.14, 3.14, name="phi_2", latex_label="$phi_2$")
+phi_3 = bilby.core.prior.Uniform(-3.14, 3.14, name="phi_3", latex_label="$phi_3$")
+# narrower function windows
+# priors['f_peak0'] = bilby.core.prior.Uniform(2700, 3100, name='f_peak0', latex_label='$f_peak0$')
+# priors['f_1'] = bilby.core.prior.Uniform(1700, 2000, name='f_1', latex_label='$f_1$')
+# priors['f_2'] = bilby.core.prior.Uniform(2100, 2400, name='f_2', latex_label='$f_2$')
+# priors['f_3'] = bilby.core.prior.Uniform(3500, 3900, name='f_3', latex_label='$f_3$')
+f_peak0 = bilby.core.prior.Uniform(2000, 2700, name="f_peak0", latex_label="$f_peak0$")
+f_1 = bilby.core.prior.Uniform(1200, 2000, name="f_1", latex_label="$f_1$")
+f_2 = bilby.core.prior.Uniform(2500, 3200, name="f_2", latex_label="$f_2$")
+f_3 = bilby.core.prior.Uniform(3500, 3900, name="f_3", latex_label="$f_3$")
+zeta_drift = bilby.core.prior.Uniform(-0.075, -0.05, name="zeta_drift", latex_label="$zeta_drift$")
+t_star = bilby.core.prior.Uniform(3, 7, name="t_star", latex_label="$t_star$")
+psi = 0
+dec = 0
+ra = 0
+geocent_time = 0
+Ap1 = bilby.core.prior.Constraint(0.14, 1)
+Ap2 = bilby.core.prior.Constraint(0.14, 1)
+Ap3 = bilby.core.prior.Constraint(0.14, 1)

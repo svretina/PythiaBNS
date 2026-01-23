@@ -1,0 +1,35 @@
+[project]
+name = "gw-pipe"
+version = "0.1.0"
+description = "A pipeline for Gravitational Wave post-merger analysis"
+authors = [
+    {name = "Stamatis Vretinaris", email = "svretina@gmail.com"}
+]
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+keywords = ["gravitational-waves", "post-merger", "astrophysics", "bilby"]
+repository = "https://github.com/svretina/gw_pipe"
+requires-python = ">=3.13"
+dependencies = [
+    "astropy (>=7.1.0)",
+    "dill (>=0.4.0)",
+    "dynesty (>=2.1.5)",
+    "h5py (>=3.13.0)",
+    "matplotlib (>=3.10.3)",
+    "numpy (>=2.2.6)",
+    "pandas (>=2.2.3)",
+    "pocomc (>=1.2.6)",
+    "scipy (>=1.15.3)",
+    "tqdm (>=4.67.1)",
+    "bilby (>=2.5.1)",
+    "pycbc (>=2.6.0)",
+    "multiprocess (>=0.70.17)"
+]
+
+[tool.poetry]
+packages = [{include = "gw_pipe", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
