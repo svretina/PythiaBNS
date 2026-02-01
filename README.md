@@ -4,6 +4,7 @@
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![CI](https://github.com/svretina/pythiabns/actions/workflows/ci.yml/badge.svg)](https://github.com/svretina/pythiabns/actions/workflows/ci.yml)
 [![Documentation](https://github.com/svretina/pythiabns/actions/workflows/docs.yml/badge.svg)](https://svretina.github.io/pythiabns/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![codecov](https://codecov.io/gh/svretina/pythiabns/branch/main/graph/badge.svg)](https://codecov.io/gh/svretina/pythiabns)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -12,7 +13,7 @@
 ## Use Cases
 
 - **Analytic Modeling**: Fit complex time-domain or frequency-domain waveform models to Numerical Relativity (NR) data.
-- **Inspiral-Informed Priors**: Constrain post-merger parameters using empirical relations (e.g., [Vretinaris et al. 2020](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.084039])) derived from inspiral measurements (mass, tidal deformability).
+- **Empirical Priors**: Constrain post-merger parameter estimation using empirical relations (e.g., [Vretinaris et al. 2020](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.084039])) derived from inspiral measurements (mass, tidal deformability).
 - **High-Efficiency Sampling**: Leverage `pocomc` (Preconditioned Monte Carlo) for efficient sampling of difficult posteriors.
 - **Benchmarking**: Validate models against a curated catalog of NR waveforms.
 

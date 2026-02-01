@@ -1,6 +1,7 @@
 site_name: PythiaBNS
 site_description: Robust BNS Post-Merger Parameter Estimation with Empirical Priors
 site_author: Stamatis Vretinaris
+site_url: https://svretina.github.io/pythiabns/
 repo_url: https://github.com/svretina/pythiabns
 repo_name: svretina/pythiabns
 

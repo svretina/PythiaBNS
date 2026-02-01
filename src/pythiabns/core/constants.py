@@ -1,12 +1,13 @@
 import os
 from pathlib import Path
+
 from astropy import constants as const
 
 # Determine paths
 _current_file = Path(__file__).resolve()
 # src/pythiabns/core/constants.py -> src/pythiabns -> src -> root
 PACKAGE_ROOT = _current_file.parent.parent
-PROJECT_ROOT = PACKAGE_ROOT.parent.parent 
+PROJECT_ROOT = PACKAGE_ROOT.parent.parent
 if (PROJECT_ROOT / "src").exists():
     pass
 else:

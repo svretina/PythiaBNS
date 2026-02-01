@@ -1,7 +1,8 @@
 import numpy as np
-import scipy.signal
 import scipy.interpolate
+import scipy.signal
 from scipy import fft
+
 
 def padding(time, h, samples):
     if len(time) >= samples:
@@ -17,9 +18,11 @@ def padding(time, h, samples):
     time = np.concatenate((time, x2add), axis=0)
     return time, h
 
+
 def windowing(signal, a=0.5):
     signal = scipy.signal.tukey(len(signal), a, sym=True) * signal
     return signal
+
 
 def fourier(time, h):
     h = windowing(h)
@@ -33,10 +36,12 @@ def fourier(time, h):
     phase = np.angle(yf)[: N // 2]
     return freqs, amplitude, np.unwrap(phase)
 
+
 def interpolate(x_old, y_old, x_new):
     interpolator = scipy.interpolate.PchipInterpolator(x_old, y_old)
     new_y = interpolator.__call__(x_new)
     return new_y
+
 
 def shift_by_phase(signal, phase):
     spec = np.fft.rfft(signal)
@@ -44,9 +49,11 @@ def shift_by_phase(signal, phase):
     shifted_signal = np.fft.irfft(spec, n=len(signal))
     return shifted_signal
 
+
 def generate_cross(signal):
     """Generate cross polarization from plus by shifting phase by 90 degrees."""
     return shift_by_phase(signal, 90)
+
 
 def my_arange(start, step, end):
     N = int((end - start) / step + 1)
