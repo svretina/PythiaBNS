@@ -19,7 +19,9 @@ class NumericalWaveform:
         # Logic ported from NR_strains.py: 
         # If 'Soultanis' in name, special handling. Else scan STRAIN_PATH.
         
-        if filename.startswith('Soultanis'):
+        if os.path.isabs(filename) or os.path.exists(filename):
+            self._load_from_path(Path(filename))
+        elif filename.startswith('Soultanis'):
             self._load_soultanis(filename)
         else:
             self._load_standard(filename)
@@ -35,14 +37,38 @@ class NumericalWaveform:
         # In original, resampling was mandatory?
         # self.resample() # TODO: Verify if mandatory
 
+    def _load_from_path(self, path: Path):
+        self.datapath = path
+        # Check if it's an NR directory
+        if (path / "metadata.txt").exists():
+            self.metadata_dict = self._load_metadata(self.datapath)
+            self.m1 = float(self.metadata_dict.get("id_mass_starA", 1.4))
+            self.m2 = float(self.metadata_dict.get("id_mass_starB", 1.4))
+            self.rh_overmtot_p, self.rh_overmtot_c, self.time, self.extraction_radius = \
+                self._read_hdf5_data()
+        else:
+            # Simple file loading (txt/csv)
+            self._load_simple_file(path)
+
     def _load_standard(self, filename: str):
         self.datapath = constants.STRAIN_PATH / filename
-        self.metadata_dict = self._load_metadata(self.datapath)
-        self.m1 = float(self.metadata_dict["id_mass_starA"])
-        self.m2 = float(self.metadata_dict["id_mass_starB"])
+        self._load_from_path(self.datapath)
+
+    def _load_simple_file(self, path: Path):
+        # Assume 3 columns: time, hp, hc
+        data = np.loadtxt(path)
+        self.time = data[:, 0]
+        self.rh_overmtot_p = data[:, 1]
+        self.rh_overmtot_c = data[:, 2]
+        self.metadata_dict = {"id_name": path.name}
+        self.m1 = 1.4 # Defaults
+        self.m2 = 1.4
+        self.extraction_radius = 0
         
-        self.rh_overmtot_p, self.rh_overmtot_c, self.time, self.extraction_radius = \
-            self._read_hdf5_data()
+        # Flag to indicate its already SI and scaled to 1Mpc?
+        # For simplicity, if loading a custom file, we assume it's h+ and hx at 1Mpc and in SI.
+        # So we skip _time_to_SI and _set_to_1Mpc logic by setting special values.
+        self._is_si = True
 
     def _load_soultanis(self, filename: str):
         # Soultanis/1.55
@@ -146,6 +172,7 @@ class NumericalWaveform:
         return meta
 
     def _time_to_SI(self):
+        if hasattr(self, "_is_si") and self._is_si: return
         if self.filename.startswith("Soultanis"): return # Already SI
         # Convert geometric time to seconds
         # time_SI = time_geom * G * M / c^3
@@ -153,6 +180,8 @@ class NumericalWaveform:
         self.time = self.time * factor
 
     def _set_to_1Mpc(self):
+        if hasattr(self, "_is_si") and self._is_si: 
+            return self.rh_overmtot_p, self.rh_overmtot_c
         if self.filename.startswith("Soultanis"):
              # Already scaled? Original code set self.hp directly.
              # In my class I stored it in rh_overmtot for consistency of storage.

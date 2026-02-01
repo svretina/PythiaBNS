@@ -2,9 +2,11 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![CI](https://github.com/svretina/pythiabns/actions/workflows/ci.yml/badge.svg)](https://github.com/svretina/pythiabns/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/svretina/pythiabns/branch/main/graph/badge.svg)](https://codecov.io/gh/svretina/pythiabns)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**PythiaBNS** is a modular, production-grade Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger signals. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE).
+**PythiaBNS** is a modular Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger waveforms. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE). **PythiaBNS** implements the method of [Vretinaris et al. 2020](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.084039), where a set of informed priors are used to constrain Parameter Estimation of post-merger waveforms leading to robust and fast inference..
 
 ## Use Cases
 
@@ -67,13 +69,17 @@ imports:
   - "my_custom_models" 
 
 matrix:
-  # Batch processing: Generate simulations for all combinations
-  waveform: 
-    - "BAM:0088:R01"  # NR Simulation ID
-  snr: 
-    - 50.0  # Target SNR
-  model: 
-    - "easter_half_reparam" # Analytic Model Name
+  # Modular Injection
+  injection:
+    - mode: "nr"
+      target: "BAM:0088:R01" # Presets from STRAIN_PATH
+    - mode: "file" 
+      target: "/path/to/my/waveform/folder" # NR format folder or .txt file
+    - mode: "analytic"
+      target: "three_sines" # Simulated from registry
+      
+  snr: [50.0, 100.0]
+  model: ["easter_half_reparam"] 
   
   sampler:
     plugin: "pocomc"
@@ -151,10 +157,53 @@ matrix:
 To verify the installation, you can run the simplified test configuration:
 
 ```bash
-uv run python src/pythiabns/spine.py test_config.yaml
+uv run python src/pythiabns/spine.py examples/test_config.yaml
 ```
 
 Check `results/verification` for the output.
+
+## 📚 Documentation
+
+PythiaBNS uses `pdoc` to generate its API documentation directly from docstrings.
+
+### Local Generation
+
+To generate and view the documentation locally, use the provided `Makefile`:
+
+```bash
+make docs
+```
+
+This will generate HTML files in `docs/html/`. You can open `docs/html/index.html` in your browser.
+
+### Automated Deployment
+
+A GitHub Action is configured to automatically generate and deploy the latest documentation to **GitHub Pages** whenever changes are pushed to the `main` branch.
+
+## 📁 Custom Waveforms
+
+PythiaBNS allows you to inject custom waveforms for PE studies. Specify `mode: "file"` in your configuration and provide a `target` path.
+
+### Supported Formats
+
+1. **NR Format (Standard)**:
+    A directory containing:
+    - `metadata.txt`: Contains parameters like `id_mass_starA`.
+    - `data.h5`: HDF5 file with `/rh_22/l2_m2_rXXX` groups containing time-series data.
+2. **Simple Text Format**:
+    A plain text file with three whitespace-separated columns:
+    - `time` (seconds)
+    - `h_plus` (dimensionless strain at 1 Mpc)
+    - `h_cross` (dimensionless strain at 1 Mpc)
+
+Example `injection` config for a text file:
+
+```yaml
+matrix:
+  injection:
+    - mode: "file"
+      target: "data/my_waveform.txt"
+```
 
 ## Tutorial: Custom Models
 
@@ -194,12 +243,24 @@ p1 = bilby.core.prior.Uniform(0.0, 2*np.pi, name="p1", latex_label="$\phi_1$", b
 Create a `tutorial.yaml` and run:
 
 ```bash
-uv run python src/pythiabns/spine.py tutorial.yaml
+uv run python src/pythiabns/spine.py examples/tutorial.yaml
 ```
 
 ### 4. Results
 
-Inference on 3 sine waves demonstrates excellent parameter recovery:
+Inference on 3 sine waves demonstrates excellent parameter recovery. Using an **SNR of 100** and **nlive=100**, we successfully retrieve the injected values:
+
+| Parameter | Injected | Retrieved (Median) |
+| :--- | :--- | :--- |
+| **$A_1$** | $1.00 \times 10^{-22}$ | $1.00 \times 10^{-22} \pm 2.8 \times 10^{-24}$ |
+| **$f_1$** | $150.0$ Hz | $150.0 \pm 0.016$ Hz |
+| **$\phi_1$** | $0.0$ rad | $0.11 \pm 3.1$ rad |
+| **$A_2$** | $0.50 \times 10^{-22}$ | $0.50 \times 10^{-22} \pm 2.5 \times 10^{-24}$ |
+| **$f_2$** | $350.0$ Hz | $350.0 \pm 0.028$ Hz |
+| **$\phi_2$** | $1.0$ rad | $1.01 \pm 0.10$ rad |
+| **$A_3$** | $0.80 \times 10^{-22}$ | $0.79 \times 10^{-22} \pm 2.8 \times 10^{-24}$ |
+| **$f_3$** | $550.0$ Hz | $550.0 \pm 0.020$ Hz |
+| **$\phi_3$** | $2.0$ rad | $2.01 \pm 0.07$ rad |
 
 ![Corner Plot](docs/images/tutorial_corner_plot.png)
 

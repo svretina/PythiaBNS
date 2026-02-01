@@ -1,0 +1,43 @@
+name: "ThreeSinesTutorial"
+output_dir: "results/tutorial"
+
+imports:
+  - "pythiabns.models.tutorial_models"
+
+matrix:
+  injection:
+    - mode: "analytic"
+      target: "three_sines"
+  snr: [100.0]
+  model: ["three_sines"]
+  
+  sampler:
+    plugin: "dynesty"
+    settings:
+      nlive: 100
+      sample: "rwalk"
+      verbose: True
+      check_point_plot: False
+  
+  priors:
+    mode: "file"
+    source: "tutorial.priors"
+  
+  injection_parameters:
+    a1: 1.0e-22
+    f1: 150.0
+    p1: 0.0
+    a2: 0.5e-22
+    f2: 350.0
+    p2: 1.0
+    a3: 0.8e-22
+    f3: 550.0
+    p3: 2.0
+    ra: 0.0
+    dec: 0.0
+    psi: 0.0
+    geocent_time: 0.0
+    t0: 0.0
+    mass_1: 1.4
+    mass_2: 1.4
+    luminosity_distance: 50.0

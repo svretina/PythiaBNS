@@ -14,9 +14,21 @@ class PriorConfig(BaseModel):
     source: str = "easter.priors" # Filename or relation name
     constraints: Optional[str] = None # Optional constraints file
 
+class InjectionConfig(BaseModel):
+    """Configuration for waveform injection source."""
+    # "nr": load from STRAIN_PATH via ID
+    # "file": load from absolute/relative path
+    # "analytic": simulate using a model from registry
+    mode: str = "nr"
+    target: Optional[str] = None # NR ID, File Path, or Model Name
+    parameters: Dict[str, float] = Field(default_factory=dict)
+
 class JobMatrix(BaseModel):
     """Configuration for expanding into multiple simulations."""
-    waveform: List[str]
+    # Support both legacy 'waveform' and new modular 'injection'
+    waveform: Optional[List[str]] = None
+    injection: Optional[List[InjectionConfig]] = None
+    
     snr: List[float] = Field(default_factory=lambda: [50.0])
     model: List[str]
     
@@ -25,17 +37,22 @@ class JobMatrix(BaseModel):
     
     # Extra model parameters like nfreqs
     model_params: Dict[str, Any] = Field(default_factory=dict)
+    # Legacy: injection_parameters at top level
     injection_parameters: Dict[str, float] = Field(default_factory=dict)
 
 class SimulationConfig(BaseModel):
     """Configuration for a single simulation run."""
-    waveform: str
+    # Single instance of injection source
+    injection: InjectionConfig
+    
     snr: float
     model: str
     sampler: SamplerConfig
     priors: PriorConfig
     
     model_params: Dict[str, Any] = Field(default_factory=dict)
+    # Legacy support
+    waveform: Optional[str] = None 
     injection_parameters: Dict[str, float] = Field(default_factory=dict)
 
 class ExperimentConfig(BaseModel):

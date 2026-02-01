@@ -12,7 +12,9 @@ venv/
 results/
 *.pdf
 *.png
+!docs/images/*.png
 *.jpg
+!docs/images/*.jpg
 *.h5
 *.whl
 NR_strains/

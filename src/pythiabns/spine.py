@@ -54,12 +54,28 @@ def main():
     
     matrix = cfg.matrix
     
-    # Cartesian product logic (simplified loop)
-    # TODO: make this robust
+    # 1. Normalize Injection/Waveform
+    if matrix.injection is None:
+        if matrix.waveform is not None:
+            # Convert legacy waveform list to injection list
+            matrix.injection = [
+                config.InjectionConfig(mode="nr", target=w) 
+                for w in matrix.waveform
+            ]
+        else:
+            # Fallback for analytic-only tutorial-like cases
+            matrix.injection = [
+                config.InjectionConfig(mode="analytic", target=matrix.model[0])
+            ]
+
+    # Cartesian product logic
     import itertools
-    keys = matrix.model_dump().keys()
-    # Filter keys that are lists
-    list_keys = [k for k in keys if isinstance(getattr(matrix, k), list)]
+    
+    # We expand over: injection, snr, model
+    # model_params and injection_parameters (legacy) are usually fixed but could be lists too if we want.
+    # For now, let's keep it simple and expand the core three.
+    
+    list_keys = ["injection", "snr", "model"]
     list_values = [getattr(matrix, k) for k in list_keys]
     
     combinations = list(itertools.product(*list_values))
@@ -67,14 +83,16 @@ def main():
     logger.info(f"Generated {len(combinations)} simulations.")
     
     for combo in tqdm(combinations):
-        # Construct simulation config from combo
         combo_dict = dict(zip(list_keys, combo))
-        # Merge with non-list items
-        sim_settings = matrix.model_dump()
-        sim_settings.update(combo_dict)
         
-        # Ensure model_params is included (it might be in sim_settings from matrix)
-        # If matrix has model_params, it's already there.
+        # Merge with other matrix settings
+        sim_settings = {
+            "sampler": matrix.sampler,
+            "priors": matrix.priors,
+            "model_params": matrix.model_params,
+            "injection_parameters": matrix.injection_parameters # Legacy top-level
+        }
+        sim_settings.update(combo_dict)
         
         # Instantiate SimulationConfig
         try:
@@ -86,23 +104,30 @@ def main():
         run_simulation(sim_config, cfg.output_dir)
 
 def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
-    logger.info(f"Running: {sim_config.waveform} | {sim_config.model} | SNR={sim_config.snr}")
+    inj = sim_config.injection
+    logger.info(f"Running Simulation | Injection: {inj.mode}:{inj.target} | Model: {sim_config.model} | SNR: {sim_config.snr}")
     
-    # 1. Load Data
-    try:
-        nr_data = NumericalWaveform(sim_config.waveform)
-    except Exception as e:
-        logger.error(f"Failed to load NR data: {e}")
-        return
-
+    # 1. Load/Prepare Injection Source
+    # We still need nr_data object (even if dummy) for priors and masses in some models
+    nr_data = None
+    
+    if inj.mode in ["nr", "file"]:
+        try:
+            # NumericalWaveform should be updated to handle paths
+            nr_data = NumericalWaveform(inj.target)
+        except Exception as e:
+            logger.error(f"Failed to load injection waveform {inj.target}: {e}")
+            return
+    
     # 2. Setup Detectors
+    # In a real pipeline, network params might come from config. 
+    # For now, keeping the tutorial/test defaults.
     network = DetectorNetwork(["H1", "L1", "V1"])
     
-    # Get Model
-    # Pass model_params as filters (e.g. nfreqs=3)
+    # 3. Setup Waveform Generator for Inference
     model_func = registry.ModelRegistry.get(sim_config.model, **sim_config.model_params)
     if model_func is None:
-        logger.error(f"Model {sim_config.model} not found with params {sim_config.model_params}")
+        logger.error(f"Recovery model {sim_config.model} not found.")
         return
         
     meta = registry.ModelRegistry.get_metadata(sim_config.model, **sim_config.model_params)
@@ -113,65 +138,66 @@ def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
         sampling_frequency=network.sampling_frequency,
         frequency_domain_source_model=model_func if domain=="frequency" else None,
         time_domain_source_model=model_func if domain=="time" else None,
-        # We need conversion function?
-        # ModelRegistry stores conversion_func in metadata? 
-        # No, decorator arg in waveforms.py passed it to register calls, but did we store it?
-        # registry.py: stores **metadata.
-        # waveforms.py: @register_model(..., conversion_func=...)
-        # So yes, it is in meta.
         parameter_conversion=meta.get("conversion_func"),
-        
-        # Start time logic?
         start_time=network.start_time
     )
     
-    # Injection parameters
-    # We need to define them. Fixed for now?
-    injection_parameters = sim_config.injection_parameters.copy()
-    if not injection_parameters:
-        injection_parameters = {
-            "mass_1": nr_data.m1 * constants.MSUN_SI,
-            "mass_2": nr_data.m2 * constants.MSUN_SI,
-            "luminosity_distance": 100.0, # Dummy dist for now
-            "theta_jn": 0.,
-            "psi": 0.,
-            "phase": 0.,
-            "geocent_time": 0.,
-            "ra": 0.,
-            "dec": 0.,
-            # Model specific params?
-            # NR injection usually injects the NR waveform itself, not the analytic model!
-            # so we should use nr_data as source model for injection.
-        }
+    # 4. Prepare Injection Parameters
+    # Merge injection-specific parameters with top-level ones
+    inj_params = sim_config.injection_parameters.copy()
+    inj_params.update(inj.parameters)
     
-    # For NR injection:
-    # Bilby needs a source model that returns the NR data.
-    # We can define a wrapper around nr_data.
-    def nr_injection_model(frequency_array, **kwargs):
-         # Returns FD nr data
-         # Or TD if time_domain_source_model
-         # We need to interpolate nr_data to required times/freqs
-         return {"plus": 0, "cross": 0} # TODO: Implement NR injection logic properly
+    # 5. Inject Signal
+    if inj.mode == "analytic":
+        # Inject using a registered model (might be different from recovery model)
+        inj_model_name = inj.target or sim_config.model
+        inj_model_func = registry.ModelRegistry.get(inj_model_name, **sim_config.model_params)
+        inj_meta = registry.ModelRegistry.get_metadata(inj_model_name, **sim_config.model_params)
+        inj_domain = inj_meta.get("domain", "frequency")
+        
+        inj_wg = bilby.gw.waveform_generator.WaveformGenerator(
+            duration=network.duration,
+            sampling_frequency=network.sampling_frequency,
+            frequency_domain_source_model=inj_model_func if inj_domain=="frequency" else None,
+            time_domain_source_model=inj_model_func if inj_domain=="time" else None,
+            parameter_conversion=inj_meta.get("conversion_func"),
+            start_time=network.start_time
+        )
+        logger.info(f"Injecting analytic signal: {inj_model_name}")
+        network.set_data(noise=False)
+        network.inject_signal(inj_wg, inj_params)
+        
+    elif inj.mode in ["nr", "file"]:
+        # Logically, we should have a way to inject NR data directly.
+        # For now, we continue to use the current pattern where we might 
+        # use the NR data to set defaults for the analytic model injection 
+        # if the user specifically asked for that (like in the tutorial).
+        # BUT the goal is to allow NR injection. 
+        
+        # REAL NR INJECTION (Placeholder logic)
+        # network.inject_signal_from_waveform_object(nr_data, ...)
+        
+        # Current logic for tutorial/legacy:
+        if inj_params:
+            logger.info(f"Injecting analytic signal informed by {inj.mode}:{inj.target}")
+            network.set_data(noise=False)
+            network.inject_signal(wg, inj_params)
+        else:
+            logger.warning("NR injection requested but no parameters provided for analytic model. "
+                           "Direct NR injection not yet fully implemented.")
     
-    # For now, let's assume we proceed to sampling assuming data is ready.
-    network.set_data(noise=False) # Zero noise for testing
+    # 6. Setup Priors
+    # Use nr_data metadata if available
+    nr_meta = nr_data.metadata_dict if nr_data else {}
+    priors = PriorFactory.create_priors(sim_config.priors, sim_config.model, nr_meta, sim_config.model_params)
     
-    # 2.5 Inject Signal
-    if injection_parameters:
-        logger.info(f"Injecting signal with parameters: {injection_parameters}")
-        network.inject_signal(wg, injection_parameters)
-    else:
-        logger.warning("No injection parameters provided. Sampling from zero noise (or NR if implemented).")
-    
-    # 3. Setup Priors
-    priors = PriorFactory.create_priors(sim_config.priors, sim_config.model, nr_data.metadata_dict, sim_config.model_params)
-    
-    # 4. Setup Likelihood
+    # 7. Setup Likelihood
     likelihood = PostMergerLikelihood(network.ifos, wg)
     
-    # 5. Run Sampler
-    # Output dir logic
-    outdir = base_outdir / f"{sim_config.waveform}_{sim_config.model}_{sim_config.snr}"
+    # 8. Run Sampler
+    # Output dir logic: use target name if possible
+    target_label = (inj.target or "sim").replace(":", "_").replace("/", "_")
+    outdir = base_outdir / f"{target_label}_{sim_config.model}_{sim_config.snr}"
     
     if sim_config.sampler.plugin == "pocomc":
         sampler = PocoMCWrapper(

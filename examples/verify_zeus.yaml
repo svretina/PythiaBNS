@@ -1,0 +1,15 @@
+name: "Verify_Zeus"
+output_dir: "results/verify_zeus"
+matrix:
+  waveform: ["BAM:0088:R01"]
+  snr: [50]
+  model: ["easter_half_reparam"]
+  sampler:
+    plugin: "zeus"
+    settings:
+      nwalkers: 10
+      nsteps: 100
+      n_cpus: 1
+  priors:
+    mode: "file"
+    source: "easter_half_reparam.priors"

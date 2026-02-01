@@ -1,0 +1,14 @@
+name: "Verify_NumPyro"
+output_dir: "results/verify_numpyro"
+matrix:
+  waveform: ["BAM:0088:R01"]
+  snr: [50]
+  model: ["easter_half_reparam"]
+  sampler:
+    plugin: "numpyro"
+    settings:
+      n_samples: 100
+      n_cpus: 1
+  priors:
+    mode: "file"
+    source: "easter_half_reparam.priors"

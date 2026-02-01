@@ -37,11 +37,12 @@ dependencies = [
     "ipython>=9.9.0",
     "corner>=2.2.3",
     "pdoc>=16.0.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
 ]
 
 [tool.poetry]
 packages = [{include = "pythiabns", from = "src"}]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

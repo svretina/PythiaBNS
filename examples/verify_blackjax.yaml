@@ -1,0 +1,13 @@
+name: "Verify_BlackJAX"
+output_dir: "results/verify_blackjax"
+matrix:
+  waveform: ["BAM:0088:R01"]
+  snr: [50]
+  model: ["easter_half_reparam"]
+  sampler:
+    plugin: "blackjax"
+    settings:
+      n_samples: 100
+  priors:
+    mode: "file"
+    source: "easter_half_reparam.priors"
