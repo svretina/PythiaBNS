@@ -40,7 +40,8 @@ def test_run_simulation_wiring(mock_pocomc, mock_likelihood, mock_priors, mock_w
       return {"plus": 0, "cross": 0}
     
     # Run
-    spine.run_simulation(sim_config, tmp_path)
+    plotting_config = config.PlottingConfig(enabled=False)
+    spine.run_simulation(sim_config, plotting_config, tmp_path)
     
     # Verifications
     # 1. NR data loaded (conceptually, even if analytic used for config, spine checks waveform prop? No, it uses nr_data for metadata)

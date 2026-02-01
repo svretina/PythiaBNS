@@ -3,8 +3,9 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![CI](https://github.com/svretina/pythiabns/actions/workflows/ci.yml/badge.svg)](https://github.com/svretina/pythiabns/actions/workflows/ci.yml)
+[![Documentation](https://github.com/svretina/pythiabns/actions/workflows/docs.yml/badge.svg)](https://svretina.github.io/pythiabns/)
 [![codecov](https://codecov.io/gh/svretina/pythiabns/branch/main/graph/badge.svg)](https://codecov.io/gh/svretina/pythiabns)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 **PythiaBNS** is a modular Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger waveforms. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE). **PythiaBNS** implements the method of Empirical Priors of [Vretinaris et al. 2026](https://journals.aps.org/prd/abstract/10.1103/g1qs-j74x), where a set of informed priors are used to constrain Parameter Estimation of post-merger waveforms leading to robust and fast inference..
 
