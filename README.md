@@ -15,7 +15,6 @@
 - **Analytic Modeling**: Fit complex time-domain or frequency-domain waveform models to Numerical Relativity (NR) data.
 - **Empirical Priors**: Constrain post-merger parameter estimation using empirical relations (e.g., [Vretinaris et al. 2020](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.084039])) derived from inspiral measurements (mass, tidal deformability).
 - **High-Efficiency Sampling**: Leverage `pocomc` (Preconditioned Monte Carlo) for efficient sampling of difficult posteriors.
-- **Benchmarking**: Validate models against a curated catalog of NR waveforms.
 
 ## 🚀 Installation
 
