@@ -201,7 +201,7 @@ uv run python src/pythiabns/spine.py tutorial.yaml
 
 Inference on 3 sine waves demonstrates excellent parameter recovery:
 
-![Corner Plot](results/tutorial/BAM:0088:R01_three_sines_100.0/corner_plot.png)
+![Corner Plot](docs/images/tutorial_corner_plot.png)
 
 ## 📄 Citation
 
