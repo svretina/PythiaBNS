@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/svretina/pythiabns/branch/main/graph/badge.svg)](https://codecov.io/gh/svretina/pythiabns)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**PythiaBNS** is a modular Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger waveforms. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE). **PythiaBNS** implements the method of [Vretinaris et al. 2020](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.101.084039), where a set of informed priors are used to constrain Parameter Estimation of post-merger waveforms leading to robust and fast inference..
+**PythiaBNS** is a modular Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger waveforms. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE). **PythiaBNS** implements the method of [Vretinaris et al. 2026](https://journals.aps.org/prd/abstract/10.1103/g1qs-j74x), where a set of informed priors are used to constrain Parameter Estimation of post-merger waveforms leading to robust and fast inference..
 
 ## Use Cases
 
