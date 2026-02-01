@@ -25,10 +25,10 @@ jobs:
 
       - name: Generate Documentation
         run: |
-          uv run pdoc src/pythiabns -o docs/html
+          uv run mkdocs build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/html
+          publish_dir: ./site
