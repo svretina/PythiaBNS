@@ -114,9 +114,7 @@ def _lh_func(f, A, fa, tau, phi):
     term5_exp = np.exp(0.785398j * f + 0.785398j * fa + 1j * phi + 0.125 / tau)
     term5_inner = 2 * fa * np.pi * tau * np.cos(phi) + (np.sin(phi) + 2j * f * np.pi * tau * np.sin(phi))
 
-    term4 = 1j + (
-        2 * (-1 * f + fa) * np.pi * tau + (term4_inner_exp * term4_inner_term - 2 * term5_exp * term5_inner)
-    )
+    term4 = 1j + (2 * (-1 * f + fa) * np.pi * tau + (term4_inner_exp * term4_inner_term - 2 * term5_exp * term5_inner))
 
     return term1 * term2 * term3 * term4
 

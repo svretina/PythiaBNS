@@ -34,6 +34,7 @@ class NutpieWrapper:
     def run(self):
         try:
             import importlib.util
+
             if importlib.util.find_spec("nutpie") is None:
                 raise ImportError
         except ImportError:
