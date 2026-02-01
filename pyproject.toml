@@ -1,14 +1,14 @@
 [project]
-name = "gw-pipe"
+name = "pythiabns"
 version = "0.1.0"
-description = "A pipeline for Gravitational Wave post-merger analysis"
+description = "PythiaBNS: A pipeline for Binary Neutron Star post-merger analysis"
 authors = [
     {name = "Stamatis Vretinaris", email = "svretina@gmail.com"}
 ]
 readme = "README.md"
 license = {text = "GPL-3.0-or-later"}
-keywords = ["gravitational-waves", "post-merger", "astrophysics", "bilby"]
-repository = "https://github.com/svretina/gw_pipe"
+keywords = ["gravitational-waves", "post-merger", "astrophysics", "bilby", "BNS", "neutron-stars"]
+repository = "https://github.com/svretina/pythiabns"
 requires-python = ">=3.13"
 dependencies = [
     "astropy (>=7.1.0)",
@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "gw_pipe", from = "src"}]
+packages = [{include = "pythiabns", from = "src"}]
 
 
 [build-system]

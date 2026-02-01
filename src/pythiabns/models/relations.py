@@ -4,7 +4,7 @@ from typing import Tuple, Dict, Any
 from abc import ABC, abstractmethod
 from scipy.interpolate import PchipInterpolator
 
-from gw_pipe.core import constants, registry
+from pythiabns.core import constants, registry
 
 # Constants adapted from predictors.py
 LENGTH_SCALE = constants.G_SI * constants.MSUN_SI / constants.C_SI**2 / 1e5 # km

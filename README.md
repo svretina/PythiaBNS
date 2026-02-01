@@ -1,10 +1,10 @@
-# GW Pipe: Robust BNS Post-Merger Parameter Estimation
+# PythiaBNS: Robust BNS Post-Merger Parameter Estimation
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![Poetry](https://img.shields.io/badge/poetry-managed-blue)](https://python-poetry.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**GW Pipe** is a modular, production-grade Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger signals. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE).
+**PythiaBNS** is a modular, production-grade Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger signals. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE).
 
 ## Use Cases
 
@@ -19,8 +19,8 @@ This project is managed with [Poetry](https://python-poetry.org/).
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/gw_pipe.git
-cd gw_pipe
+git clone https://github.com/your-username/pythiabns.git
+cd pythiabns
 
 # Install dependencies (including dev tools)
 poetry install
@@ -31,7 +31,7 @@ poetry shell
 
 ## 📂 Project Structure
 
-The library is organized into specialized modules within `src/gw_pipe`:
+The library is organized into specialized modules within `src/pythiabns`:
 
 - `core/`: Core infrastructure.
   - `config.py`: Configuration schemas (`Pydantic`) and loading logic.
@@ -98,7 +98,7 @@ The main orchestrator is `spine.py`. It reads the config, expands the job matrix
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 
 # Run with config
-poetry run python3 src/gw_pipe/spine.py config.yaml
+poetry run python3 src/pythiabns/spine.py config.yaml
 ```
 
 ### Adding New Models
@@ -109,7 +109,7 @@ GW Pipe uses a registry system. You can add new models without modifying the cor
 
 ```python
 import numpy as np
-from gw_pipe.core.registry import ModelRegistry
+from pythiabns.core.registry import ModelRegistry
 
 def my_conversion_func(params):
     # logic ...
@@ -135,7 +135,7 @@ matrix:
 To verify the installation, you can run the simplified test configuration:
 
 ```bash
-poetry run python3 src/gw_pipe/spine.py test_config.yaml
+poetry run python3 src/pythiabns/spine.py test_config.yaml
 ```
 
 Check `results/verification` for the output.

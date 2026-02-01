@@ -3,7 +3,7 @@ import numpy as np
 from typing import List, Dict, Optional, Union
 import logging
 
-from gw_pipe.data_utils.nr import NumericalWaveform
+from pythiabns.data_utils.nr import NumericalWaveform
 
 logger = logging.getLogger(__name__)
 

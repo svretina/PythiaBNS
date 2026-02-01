@@ -1,5 +1,5 @@
 import bilby
-from gw_pipe.models.interface import WaveformModel
+from pythiabns.models.interface import WaveformModel
 
 class PostMergerLikelihood(bilby.gw.likelihood.GravitationalWaveTransient):
     """

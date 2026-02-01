@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Tuple, Dict, Any, Optional
 import os
 
-from gw_pipe.core import constants
-from gw_pipe.data_utils import processing
+from pythiabns.core import constants
+from pythiabns.data_utils import processing
 
 class NumericalWaveform:
     """Class to handle loading and processing of NR waveforms."""

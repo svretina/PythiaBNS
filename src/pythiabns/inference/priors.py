@@ -3,8 +3,8 @@ import numpy as np
 import logging
 from typing import Dict, Any, Optional
 
-from gw_pipe.core import constants, registry
-from gw_pipe.core.config import PriorConfig
+from pythiabns.core import constants, registry
+from pythiabns.core.config import PriorConfig
 
 logger = logging.getLogger(__name__)
 

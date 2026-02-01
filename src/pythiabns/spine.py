@@ -4,19 +4,19 @@ from pathlib import Path
 from tqdm import tqdm
 import bilby
 
-from gw_pipe.core import config, constants, registry
-from gw_pipe.data_utils.nr import NumericalWaveform
-from gw_pipe.detectors.network import DetectorNetwork
-from gw_pipe.inference.priors import PriorFactory
-from gw_pipe.inference.likelihood import PostMergerLikelihood
-from gw_pipe.inference.samplers.pocomc import PocoMCWrapper
+from pythiabns.core import config, constants, registry
+from pythiabns.data_utils.nr import NumericalWaveform
+from pythiabns.detectors.network import DetectorNetwork
+from pythiabns.inference.priors import PriorFactory
+from pythiabns.inference.likelihood import PostMergerLikelihood
+from pythiabns.inference.samplers.pocomc import PocoMCWrapper
 
 # Ensure models are registered
-import gw_pipe.models.waveforms 
-import gw_pipe.models.relations
+import pythiabns.models.waveforms 
+import pythiabns.models.relations
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("gw_pipe.spine")
+logger = logging.getLogger("pythiabns.spine")
 
 def main():
     parser = argparse.ArgumentParser(description="GW Post-Merger Pipeline")

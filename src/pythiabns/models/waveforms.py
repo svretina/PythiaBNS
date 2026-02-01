@@ -2,8 +2,8 @@ import numpy as np
 import logging
 from typing import Dict, Any, Optional
 
-from gw_pipe.core.registry import ModelRegistry
-from gw_pipe.data_utils import processing
+from pythiabns.core.registry import ModelRegistry
+from pythiabns.data_utils import processing
 
 logger = logging.getLogger(__name__)
 

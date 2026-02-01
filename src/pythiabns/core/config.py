@@ -3,7 +3,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field
 
-from gw_pipe.core import constants
+from pythiabns.core import constants
 
 class SamplerConfig(BaseModel):
     plugin: str = "pocomc"
