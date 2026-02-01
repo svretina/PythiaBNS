@@ -4,6 +4,15 @@ output_dir: "results/tutorial"
 imports:
   - "pythiabns.models.tutorial_models"
 
+plotting:
+  enabled: true
+  plots: ["corner", "trace"]
+  settings:
+    corner:
+      show_titles: true
+    trace:
+      dpi: 150
+
 matrix:
   injection:
     - mode: "analytic"

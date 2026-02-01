@@ -55,10 +55,18 @@ class SimulationConfig(BaseModel):
     waveform: Optional[str] = None 
     injection_parameters: Dict[str, float] = Field(default_factory=dict)
 
+class PlottingConfig(BaseModel):
+    enabled: bool = True
+    plots: List[str] = Field(default_factory=lambda: ["corner", "trace"])
+    settings: Dict[str, Any] = Field(default_factory=dict)
+
 class ExperimentConfig(BaseModel):
     name: str = "GW_Experiment"
     output_dir: Path = constants.RESULTS_PATH
     imports: List[str] = Field(default_factory=list)
+    
+    plotting: PlottingConfig = Field(default_factory=PlottingConfig)
+    
     matrix: JobMatrix
 
 def load_config(path: Union[str, Path]) -> ExperimentConfig:

@@ -97,6 +97,60 @@ matrix:
       nfreqs: 3
 ```
 
+### 🔄 Combinatorial Configuration (Matrix)
+
+PythiaBNS is designed to make parameter studies effortless through its combinatorial matrix system. Any argument in the `matrix` section of the configuration file can be provided as a list. The pipeline will automatically generate and run simulations for **all Cartesian products** (all possible combinations) of these lists.
+
+**Example Study:**
+
+```yaml
+matrix:
+  # ...
+  snr: [20, 50, 100]            # 3 values
+  model: ["model_A", "model_B"] # 2 models
+  sampler:
+    plugin: "pocomc"
+    settings:
+      n_cpus: [8, 16]           # 2 settings
+```
+
+This configuration will automatically trigger **3 × 2 × 2 = 12 distinct simulations**, covering every combination of SNR, model, and CPU count. This feature enables you to effortlessly launch large-scale injection campaigns, sensitivity analyses, or convergence studies with a single configuration file.
+
+### 📂 Output Structure & Smart Naming
+
+PythiaBNS automatically organizes results to keep large campaigns structured.
+
+- **Study Folder**: Named after the configuration file (or the `name` field).
+- **Run Subfolders**: Each simulation gets a dedicated subfolder with an informative name, automatically generated from the varying parameters (e.g., `run001_inj_three_sines_snr50.0_model_three_sines`).
+
+**Resulting Directory Tree:**
+
+```text
+results/
+└── MyStudy/
+    ├── run000_inj_three_sines_snr50.0_model_A/
+    ├── run001_inj_three_sines_snr100.0_model_A/
+    └── ...
+```
+
+### 📊 Automated Plotting
+
+You can configure automated plot generation directly in your YAML config. Plots are generated at the end of each simulation and saved in the respective run folder.
+
+**Configuration Example:**
+
+```yaml
+plotting:
+  enabled: true
+  plots: ["corner", "trace"] # Supported: corner, trace
+  settings:
+    corner:
+      show_titles: true
+      quantiles: [0.16, 0.5, 0.84]
+    trace:
+      dpi: 150
+```
+
 ## ⚡ Usage
 
 ### Running the Pipeline

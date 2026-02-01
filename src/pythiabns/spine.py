@@ -9,7 +9,7 @@ from pathlib import Path
 from tqdm import tqdm
 import bilby
 
-from pythiabns.core import config, constants, registry
+from pythiabns.core import config, constants, registry, plotting
 from pythiabns.data_utils.nr import NumericalWaveform
 from pythiabns.detectors.network import DetectorNetwork
 from pythiabns.inference.priors import PriorFactory
@@ -35,7 +35,15 @@ def main():
     args = parser.parse_args()
     
     # Load Configuration
-    cfg = config.load_config(args.config)
+    config_path = Path(args.config)
+    cfg = config.load_config(config_path)
+    
+    # Determine Study Name (Folder Name)
+    # Prefer config 'name' if explicit, otherwise file stem
+    study_name = cfg.name if cfg.name != "GW_Experiment" else config_path.stem
+    study_outdir = cfg.output_dir / study_name
+    
+    logger.info(f"Study: {study_name} | Output: {study_outdir}")
     
     # Load Plugins/Imports
     import importlib
@@ -80,10 +88,21 @@ def main():
     
     combinations = list(itertools.product(*list_values))
     
-    logger.info(f"Generated {len(combinations)} simulations.")
+    logger.info(f"Generated {len(combinations)} simulations for study '{study_name}'.")
     
-    for combo in tqdm(combinations):
+    for i, combo in enumerate(tqdm(combinations)):
         combo_dict = dict(zip(list_keys, combo))
+        
+        # Smart Folder Naming
+        # Construct a name based on the varying parameters
+        inj_str = (combo_dict['injection'].target or "sim").replace(":", "_").replace("/", "_")
+        if combo_dict['injection'].mode == "analytic":
+             inj_str = f"inj_{inj_str}"
+        elif combo_dict['injection'].mode == "nr":
+             inj_str = f"nr_{inj_str}"
+
+        run_name = f"run{i:03d}_{inj_str}_snr{combo_dict['snr']}_model_{combo_dict['model']}"
+        run_outdir = study_outdir / run_name
         
         # Merge with other matrix settings
         sim_settings = {
@@ -101,11 +120,11 @@ def main():
             logger.error(f"Config Error: {e}")
             continue
             
-        run_simulation(sim_config, cfg.output_dir)
+        run_simulation(sim_config, cfg.plotting, run_outdir)
 
-def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
+def run_simulation(sim_config: config.SimulationConfig, plot_config: config.PlottingConfig, outdir: Path):
     inj = sim_config.injection
-    logger.info(f"Running Simulation | Injection: {inj.mode}:{inj.target} | Model: {sim_config.model} | SNR: {sim_config.snr}")
+    logger.info(f"Running Simulation -> {outdir.name}")
     
     # 1. Load/Prepare Injection Source
     # We still need nr_data object (even if dummy) for priors and masses in some models
@@ -195,10 +214,9 @@ def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
     likelihood = PostMergerLikelihood(network.ifos, wg)
     
     # 8. Run Sampler
-    # Output dir logic: use target name if possible
-    target_label = (inj.target or "sim").replace(":", "_").replace("/", "_")
-    outdir = base_outdir / f"{target_label}_{sim_config.model}_{sim_config.snr}"
+    # Use passed outdir
     
+    sampler = None
     if sim_config.sampler.plugin == "pocomc":
         sampler = PocoMCWrapper(
             likelihood, 
@@ -271,6 +289,23 @@ def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
             label=sim_config.model,
             **sim_config.sampler.settings
         )
+    
+    # 9. Plotting
+    # If sampler provides a uniform result object/path, we read it
+    # Note: Wrappers typically save a `_result.json`
+    # We reuse the `sampler` object if it has a `result` property, or load from file.
+    
+    # Attempt to load the result.
+    # Most Bilby samplers save to outdir/label_result.json
+    result_path = outdir / f"{sim_config.model}_result.json"
+    if result_path.exists():
+        try:
+            result = bilby.result.read_in_result(filename=str(result_path))
+            plotting.generate_plots(result, plot_config, outdir)
+        except Exception as e:
+            logger.error(f"Plotting failed: Could not read result file {result_path}: {e}")
+    else:
+        logger.warning(f"No result file found at {result_path}, skipping plots.")
 
 if __name__ == "__main__":
     main()
