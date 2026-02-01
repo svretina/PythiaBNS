@@ -1,77 +1,88 @@
-# gw_pipe: Architectural Overview
+# GW Pipe Architecture Overview
 
-This document provides a sketch of the library's functionality, component interactions, and execution flow.
+This document provides a high-level overview of the `gw_pipe` library architecture, designed for modularity, extensibility, and 3G-detector readiness.
 
-## 1. High-Level Hierarchy
+## 🏗️ High-Level Structure
 
-The library follows a modular design where core orchestration is decoupled from physics models and configuration parsing.
+The library is organized into five main pillars located in `src/gw_pipe`:
+
+| Module | Purpose | Key Components |
+| :--- | :--- | :--- |
+| **`core`** | Configuration & Infrastructure | `ExperimentConfig`, `ModelRegistry`, `constants` |
+| **`models`** | Physics & Waveforms | `WaveformModel` (Protocol), `EmpiricalRelation` |
+| **`inference`** | Bayesian Inference Engine | `PriorFactory`, `PostMergerLikelihood`, `PocoMCWrapper` |
+| **`detectors`** | Instrument Modeling | `DetectorNetwork` (LIGO/Virgo/ET/CE) |
+| **`data_utils`** | Data I/O & Processing | `NumericalWaveform` (NR loader), Signal Processing |
+
+## 🔄 Execution Flow
+
+The pipeline execution is orchestrated by `spine.py`.
+
+1. **Configuration Loading**:
+    * `core.config.load_config` reads the YAML file.
+    * Data is validated against `pydantic` schemas (`ExperimentConfig`, `JobMatrix`).
+    * Plugins are imported dynamically if specified.
+
+2. **Job Matrix Expansion**:
+    * The `JobMatrix` from the config is expanded into individual `SimulationConfig` objects (Cartesian product of waveforms, models, SNRs, etc.).
+
+3. **Simulation Initialization** (`run_simulation`):
+    * **Data**: `NumericalWaveform` loads NR data (HDF5/ASCII), converts to SI units, and scales to 1Mpc.
+    * **Detectors**: `DetectorNetwork` initializes interferometers (e.g., H1, L1, V1) and sets up noise/PSDs.
+    * **Model**: The requested analytic model is retrieved from `ModelRegistry` using user-specified parameters (e.g., `nfreqs=3`).
+
+4. **Inference Setup**:
+    * **Priors**: `PriorFactory` builds the `Bilby` prior dictionary.
+        * *File Mode*: Loads from `.priors` files.
+        * *Empirical Mode*: Uses `EmpiricalRelation` (e.g., VSB, Koutalios) to predict parameters properties from EOS/mass data.
+    * **Likelihood**: `PostMergerLikelihood` (subclass of `bilby.GravitationalWaveTransient`) is instantiated.
+
+5. **Sampling**:
+    * If `sampler: pocomc` is selected, the `PocoMCWrapper` handles the interface between Bilby's likelihood and the Preconditioned Monte Carlo sampler, managing multiprocessing and serialization.
+    * Results are saved as JSON and Pickle files in the output directory.
+
+## 🧩 Key Components
+
+### 1. `core.registry.ModelRegistry`
+
+A central registry pattern that allows decoupling model implementation from the orchestrator.
+
+* **Usage**: Decorate functions in `models/waveforms.py` with `@ModelRegistry.register("name", domain="time", ...)`.
+* **Benefit**: Users can add new models in external scripts without modifying `gw_pipe` source code.
+
+### 2. `inference.priors.PriorFactory`
+
+Abstracts the complex logic of prior generation.
+
+* It handles the conversion of strings (from config) to executable code or file loads.
+* It injects "Empirical Priors" by querying `relations.py` for physics-informed constraints (e.g., relating peak frequency to tidal deformability).
+
+### 3. `inference.samplers.PocoMCWrapper`
+
+A custom wrapper designed to bridge `bilby` and `pocomc`.
+
+* Handles the translation of `bilby.PriorDict` (and constraints) to `pocomc`'s expected `Prior` interface.
+* Manages `multiprocess` pools to ensure picklability of likelihood functions during parallel sampling.
+
+## 📊 Data Flow
 
 ```mermaid
 graph TD
-    A[spine.py: Entry Point] --> B[config.py: Parser]
-    A --> C[spine.run: Orchestrator]
-    C --> D[spine.main: Simulation Task]
+    Config[YAML Config] -->|Parse & Validate| Spine(Orchestrator)
+    NR[NR Data (HDF5)] -->|Load| Spine
     
-    subgraph "Simulation Task Components"
-        D --> E[NR_strains.py: Data Loading]
-        D --> F[ifo.py: Detector Handling]
-        D --> G[source_model.py: Registry/Models]
-        D --> H[priors.py: Bayesian Priors]
-        D --> I[bilby: Inference Engine]
+    subgraph "Phase 1: Setup"
+    Spine -->|Init| Detectors[DetectorNetwork]
+    Spine -->|Get| Registry[ModelRegistry]
+    Spine -->|Create| Priors[PriorFactory]
     end
-
-    G -.-> J[registry.py: Global Registry]
-    H -.-> J
-    K[models.py: User Extensions] -.-> J
-```
-
-## 2. Execution Flow
-
-The typical workflow follows these steps:
-
-1. **Configuration Parsing**:
-    * `spine.py` reads the `.cfg` file via `config.py`.
-    * `create_iterator_dict()` generates a Cartesian product of all parameters (e.g., multiple SNR values x multiple models).
-2. **Simulation Orchestration**:
-    * `spine.run()` manages a `multiprocess.Pool` to run several simulations in parallel.
-3. **Individual Simulation (`main`)**:
-    * **Data Preparation**: `NumericalData` loads the NR waveform (plus/cross) and metadata.
-    * **Injection**: `InterferometerHandler` takes the NR signal and injects it into a simulated detector network (H1, L1, V1) with or without Gaussian noise.
-    * **Model Lookup**: The `ModelRegistry` retrieves the requested waveform model and its parameter conversion function.
-    * **Prior Setup**: `get_priors()` finds the relevant `.priors` file and applies empirical relations (e.g., $f_{\mathrm{peak}}$ predictions).
-    * **Sampling**: Bilby runs the chosen sampler (`dynesty` or `pocomc`) to perform the Bayesian parameter estimation.
-    * **Cleanup**: Results are saved as JSON and PDF plots in a structured output directory.
-
-## 3. Component Breakdown
-
-| Component | Responsibility | Key Class/Function |
-| :--- | :--- | :--- |
-| **spine.py** | Entry point and parallel orchestration. | `run()`, `main()` |
-| **config.py** | Handles `.cfg` files and produces task iterators. | `Config` |
-| **registry.py** | Central hub for model and conversion discovery. | `ModelRegistry` |
-| **source_model.py**| Built-in physics models for post-merger signals. | `lorentzian`, `easter_model` |
-| **models.py** | User-facing file to add custom GW models. | `@register_model` |
-| **priors.py** | Maps physical parameters to Bayesian priors. | `get_priors()` |
-| **ifo.py** | Interfaces with Bilby detectors and injections. | `InterferometerHandler` |
-| **NR_strains.py** | Low-level loading of NR data (BAM, THC, etc.). | `NumericalData` |
-| **global_vars.py** | Consistent paths and constant management. | `project_path` |
-
-## 4. How Models are Called
-
-When `bilby` evaluates the likelihood, it calls the `WaveformGenerator`. The generator then calls the function registered in our logic:
-
-```mermaid
-sequenceDiagram
-    participant B as Bilby Sampler
-    participant WG as WaveformGenerator
-    participant SM as source_model.py
-    participant R as registry.py
     
-    B->>WG: Request frequency_domain_strain(parameters)
-    WG->>WG: Apply parameter_conversion_func()
-    WG->>SM: Call registered model function
-    SM-->>B: Return {"plus": h+, "cross": hx}
+    subgraph "Phase 2: Sampling"
+    Priors --> Sampler[PocoMCSampler]
+    Detectors --> Likelihood
+    Registry --> Likelihood
+    Likelihood --> Sampler
+    end
+    
+    Sampler -->|Output| Results[JSON / Pickle]
 ```
-
----
-*Created by Antigravity*

@@ -14,5 +14,7 @@ results/
 *.png
 *.jpg
 *.h5
+*.whl
 NR_strains/
-architecture_overview.pdf
+architecture_overview.md
+GEMINI.md

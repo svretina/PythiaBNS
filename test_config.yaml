@@ -1,0 +1,18 @@
+name: "Verification_Run"
+output_dir: "results/verification"
+imports: []
+matrix:
+  waveform: ["BAM:0088:R01"]
+  snr: [50]
+  model: ["easter_half_reparam"]
+
+  sampler:
+    plugin: "pocomc"
+    settings:
+      npoints: 100
+      corr_threshold: 0.5
+      n_cpus: 1
+
+  priors:
+    mode: "file"
+    source: "easter_half_reparam.priors"
