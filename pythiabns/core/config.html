@@ -133,6 +133,21 @@
 
             </li>
             <li>
+                    <a class="class" href="#PlottingConfig">PlottingConfig</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#PlottingConfig.enabled">enabled</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#PlottingConfig.plots">plots</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#PlottingConfig.settings">settings</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#ExperimentConfig">ExperimentConfig</a>
                             <ul class="memberlist">
                         <li>
@@ -143,6 +158,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#ExperimentConfig.imports">imports</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExperimentConfig.plotting">plotting</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExperimentConfig.matrix">matrix</a>
@@ -231,21 +249,29 @@
 </span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="n">waveform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span> 
 </span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="n">injection_parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ExperimentConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GW_Experiment&quot;</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RESULTS_PATH</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="n">imports</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="n">matrix</span><span class="p">:</span> <span class="n">JobMatrix</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ExperimentConfig</span><span class="p">:</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config file not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>    
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>    <span class="k">return</span> <span class="n">ExperimentConfig</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="k">class</span><span class="w"> </span><span class="nc">PlottingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="n">plots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="s2">&quot;trace&quot;</span><span class="p">])</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="n">settings</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ExperimentConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GW_Experiment&quot;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RESULTS_PATH</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="n">imports</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>    <span class="n">plotting</span><span class="p">:</span> <span class="n">PlottingConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PlottingConfig</span><span class="p">)</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>    
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>    <span class="n">matrix</span><span class="p">:</span> <span class="n">JobMatrix</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ExperimentConfig</span><span class="p">:</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config file not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>    
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>    
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>    <span class="k">return</span> <span class="n">ExperimentConfig</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -738,6 +764,95 @@ __pydantic_private__: Values of private attributes set on the model instance.
 
                             </div>
                 </section>
+                <section id="PlottingConfig">
+                            <input id="PlottingConfig-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">PlottingConfig</span><wbr>(<span class="base">pydantic.main.BaseModel</span>):
+
+                <label class="view-source-button" for="PlottingConfig-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#PlottingConfig"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="PlottingConfig-59"><a href="#PlottingConfig-59"><span class="linenos">59</span></a><span class="k">class</span><span class="w"> </span><span class="nc">PlottingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="PlottingConfig-60"><a href="#PlottingConfig-60"><span class="linenos">60</span></a>    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="PlottingConfig-61"><a href="#PlottingConfig-61"><span class="linenos">61</span></a>    <span class="n">plots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="s2">&quot;trace&quot;</span><span class="p">])</span>
+</span><span id="PlottingConfig-62"><a href="#PlottingConfig-62"><span class="linenos">62</span></a>    <span class="n">settings</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>!!! abstract "Usage Documentation"
+    <a href="../concepts/models.md">Models</a></p>
+
+<p>A base class for creating Pydantic models.</p>
+
+<p>Attributes:
+    __class_vars__: The names of the class variables defined on the model.
+    __private_attributes__: Metadata about the private attributes of the model.
+    __signature__: The synthesized <code>__init__</code> [<code>Signature</code>][inspect.Signature] of the model.</p>
+
+<pre><code>__pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+__pydantic_core_schema__: The core schema of the model.
+__pydantic_custom_init__: Whether the model has a custom `__init__` function.
+__pydantic_decorators__: Metadata containing the decorators defined on the model.
+    This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+__pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+    __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+__pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+__pydantic_post_init__: The name of the post-init method for the model, if defined.
+__pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+__pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+__pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+__pydantic_fields__: A dictionary of field names and their corresponding [`FieldInfo`][pydantic.fields.FieldInfo] objects.
+__pydantic_computed_fields__: A dictionary of computed field names and their corresponding [`ComputedFieldInfo`][pydantic.fields.ComputedFieldInfo] objects.
+
+__pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+    is set to `'allow'`.
+__pydantic_fields_set__: The names of fields explicitly set during instantiation.
+__pydantic_private__: Values of private attributes set on the model instance.
+</code></pre>
+</div>
+
+
+                            <div id="PlottingConfig.enabled" class="classattr">
+                                <div class="attr variable">
+            <span class="name">enabled</span><span class="annotation">: bool</span>        =
+<span class="default_value">True</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PlottingConfig.enabled"></a>
+    
+    
+
+                            </div>
+                            <div id="PlottingConfig.plots" class="classattr">
+                                <div class="attr variable">
+            <span class="name">plots</span><span class="annotation">: List[str]</span>        =
+<span class="default_value">PydanticUndefined</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PlottingConfig.plots"></a>
+    
+    
+
+                            </div>
+                            <div id="PlottingConfig.settings" class="classattr">
+                                <div class="attr variable">
+            <span class="name">settings</span><span class="annotation">: Dict[str, Any]</span>        =
+<span class="default_value">PydanticUndefined</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PlottingConfig.settings"></a>
+    
+    
+
+                            </div>
+                </section>
                 <section id="ExperimentConfig">
                             <input id="ExperimentConfig-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
@@ -749,11 +864,14 @@ __pydantic_private__: Values of private attributes set on the model instance.
 
     </div>
     <a class="headerlink" href="#ExperimentConfig"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ExperimentConfig-59"><a href="#ExperimentConfig-59"><span class="linenos">59</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ExperimentConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="ExperimentConfig-60"><a href="#ExperimentConfig-60"><span class="linenos">60</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GW_Experiment&quot;</span>
-</span><span id="ExperimentConfig-61"><a href="#ExperimentConfig-61"><span class="linenos">61</span></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RESULTS_PATH</span>
-</span><span id="ExperimentConfig-62"><a href="#ExperimentConfig-62"><span class="linenos">62</span></a>    <span class="n">imports</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-</span><span id="ExperimentConfig-63"><a href="#ExperimentConfig-63"><span class="linenos">63</span></a>    <span class="n">matrix</span><span class="p">:</span> <span class="n">JobMatrix</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ExperimentConfig-64"><a href="#ExperimentConfig-64"><span class="linenos">64</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ExperimentConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="ExperimentConfig-65"><a href="#ExperimentConfig-65"><span class="linenos">65</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GW_Experiment&quot;</span>
+</span><span id="ExperimentConfig-66"><a href="#ExperimentConfig-66"><span class="linenos">66</span></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RESULTS_PATH</span>
+</span><span id="ExperimentConfig-67"><a href="#ExperimentConfig-67"><span class="linenos">67</span></a>    <span class="n">imports</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span id="ExperimentConfig-68"><a href="#ExperimentConfig-68"><span class="linenos">68</span></a>    
+</span><span id="ExperimentConfig-69"><a href="#ExperimentConfig-69"><span class="linenos">69</span></a>    <span class="n">plotting</span><span class="p">:</span> <span class="n">PlottingConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PlottingConfig</span><span class="p">)</span>
+</span><span id="ExperimentConfig-70"><a href="#ExperimentConfig-70"><span class="linenos">70</span></a>    
+</span><span id="ExperimentConfig-71"><a href="#ExperimentConfig-71"><span class="linenos">71</span></a>    <span class="n">matrix</span><span class="p">:</span> <span class="n">JobMatrix</span>
 </span></pre></div>
 
 
@@ -827,6 +945,18 @@ __pydantic_private__: Values of private attributes set on the model instance.
     
 
                             </div>
+                            <div id="ExperimentConfig.plotting" class="classattr">
+                                <div class="attr variable">
+            <span class="name">plotting</span><span class="annotation">: <a href="#PlottingConfig">PlottingConfig</a></span>        =
+<span class="default_value">PydanticUndefined</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExperimentConfig.plotting"></a>
+    
+    
+
+                            </div>
                             <div id="ExperimentConfig.matrix" class="classattr">
                                 <div class="attr variable">
             <span class="name">matrix</span><span class="annotation">: <a href="#JobMatrix">JobMatrix</a></span>        =
@@ -851,15 +981,15 @@ __pydantic_private__: Values of private attributes set on the model instance.
 
     </div>
     <a class="headerlink" href="#load_config"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="load_config-65"><a href="#load_config-65"><span class="linenos">65</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ExperimentConfig</span><span class="p">:</span>
-</span><span id="load_config-66"><a href="#load_config-66"><span class="linenos">66</span></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span id="load_config-67"><a href="#load_config-67"><span class="linenos">67</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span id="load_config-68"><a href="#load_config-68"><span class="linenos">68</span></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config file not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="load_config-69"><a href="#load_config-69"><span class="linenos">69</span></a>    
-</span><span id="load_config-70"><a href="#load_config-70"><span class="linenos">70</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="load_config-71"><a href="#load_config-71"><span class="linenos">71</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="load_config-72"><a href="#load_config-72"><span class="linenos">72</span></a>    
-</span><span id="load_config-73"><a href="#load_config-73"><span class="linenos">73</span></a>    <span class="k">return</span> <span class="n">ExperimentConfig</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="load_config-73"><a href="#load_config-73"><span class="linenos">73</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ExperimentConfig</span><span class="p">:</span>
+</span><span id="load_config-74"><a href="#load_config-74"><span class="linenos">74</span></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="load_config-75"><a href="#load_config-75"><span class="linenos">75</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span id="load_config-76"><a href="#load_config-76"><span class="linenos">76</span></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config file not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="load_config-77"><a href="#load_config-77"><span class="linenos">77</span></a>    
+</span><span id="load_config-78"><a href="#load_config-78"><span class="linenos">78</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="load_config-79"><a href="#load_config-79"><span class="linenos">79</span></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="load_config-80"><a href="#load_config-80"><span class="linenos">80</span></a>    
+</span><span id="load_config-81"><a href="#load_config-81"><span class="linenos">81</span></a>    <span class="k">return</span> <span class="n">ExperimentConfig</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
 </span></pre></div>
 
 
