@@ -1,7 +1,7 @@
 # PythiaBNS: Robust BNS Post-Merger Parameter Estimation
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
-[![Poetry](https://img.shields.io/badge/poetry-managed-blue)](https://python-poetry.org/)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **PythiaBNS** is a modular, production-grade Python library designed for Bayesian Parameter Estimation (PE) of Binary Neutron Star (BNS) post-merger signals. It is architected to support next-generation (3G) gravitational wave observatories like Einstein Telescope (ET) and Cosmic Explorer (CE).
@@ -15,18 +15,15 @@
 
 ## 🚀 Installation
 
-This project is managed with [Poetry](https://python-poetry.org/).
+This project is managed with [uv](https://github.com/astral-sh/uv).
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/pythiabns.git
+git clone https://github.com/svretina/pythiabns.git
 cd pythiabns
 
-# Install dependencies (including dev tools)
-poetry install
-
-# Activate the virtual environment
-poetry shell
+# Install dependencies and create virtual environment
+uv sync
 ```
 
 ## 📂 Project Structure
@@ -43,7 +40,14 @@ The library is organized into specialized modules within `src/pythiabns`:
   - `interface.py`: `WaveformModel` Protocol definition.
 - `inference/`: Bayesian inference tools.
   - `priors.py`: Prior generation factory, supporting file-based and empirical priors.
-  - `samplers/pocomc.py`: Robust wrapper for `pocomc` sampler.
+  - `samplers/`: Pluggable sampler wrappers.
+    - `pocomc.py`: Robust wrapper for `pocomc`.
+    - `zeus.py`: Wrapper for `zeus-mcmc`.
+    - `numpyro_sampler.py`: JAX-based `NumPyro` (SA) wrapper.
+    - `blackjax_sampler.py`: JAX-based `BlackJAX` (RWM) wrapper.
+    - `tempest.py`: `Tempest` Persistent Sampler wrapper.
+    - `stan_sampler.py`: `CmdStanPy` wrapper.
+    - `nutpie_sampler.py`: `Nutpie` (NUTS) wrapper.
   - `likelihood.py`: Custom likelihood classes (extending `bilby`).
 - `detectors/`: Detector network management (`network.py`).
 - `data_utils/`: Data processing and NR waveform loading (`nr.py`, `processing.py`).
@@ -94,12 +98,24 @@ matrix:
 The main orchestrator is `spine.py`. It reads the config, expands the job matrix, and executes simulations.
 
 ```bash
-# Ensure src is in PYTHONPATH
-export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-
-# Run with config
-poetry run python3 src/pythiabns/spine.py config.yaml
+# Run with config using uv
+uv run python src/pythiabns/spine.py config.yaml
 ```
+
+### Supported Samplers
+
+PythiaBNS supports multiple backends via its plugin system:
+
+| Sampler | Plugin Name | Type | Status |
+| :--- | :--- | :--- | :--- |
+| **PocoMC** | `pocomc` | Preconditioned MC | ✅ Functional |
+| **Zeus** | `zeus` | Ensemble Slice | ✅ Functional |
+| **NumPyro** | `numpyro` | JAX (SA) | ✅ Functional |
+| **BlackJAX** | `blackjax` | JAX (RWM) | ✅ Functional |
+| **Tempest** | `tempest` | Persistent Sampler | ✅ Functional |
+| **Stan** | `stan` | HMC/NUTS | 🏗️ Wrapper (Plugin) |
+| **Nutpie** | `nutpie` | Rust NUTS | 🏗️ Wrapper (Plugin) |
+| **Bilby Natives** | `dynesty`, etc. | Various | ✅ Functional |
 
 ### Adding New Models
 
@@ -135,7 +151,75 @@ matrix:
 To verify the installation, you can run the simplified test configuration:
 
 ```bash
-poetry run python3 src/pythiabns/spine.py test_config.yaml
+uv run python src/pythiabns/spine.py test_config.yaml
 ```
 
 Check `results/verification` for the output.
+
+## Tutorial: Custom Models
+
+PythiaBNS makes it easy to define custom waveform models and perform infernece.
+
+### 1. Define your model
+
+Create a file like `src/pythiabns/models/tutorial_models.py`:
+
+```python
+from pythiabns.core.registry import ModelRegistry
+import numpy as np
+
+@ModelRegistry.register("three_sines")
+def three_sines(time, a1, f1, p1, a2, f2, p2, a3, f3, p3, **kwargs):
+    plus = (
+        a1 * np.sin(2 * np.pi * f1 * time + p1) +
+        a2 * np.sin(2 * np.pi * f2 * time + p2) +
+        a3 * np.sin(2 * np.pi * f3 * time + p3)
+    )
+    return {"plus": plus, "cross": plus} # Simplified cross
+```
+
+### 2. Configure Priors
+
+Define your priors in `src/pythiabns/priors/tutorial.priors`:
+
+```python
+a1 = bilby.core.prior.Uniform(1e-23, 2e-22, name="a1", latex_label="$A_1$")
+f1 = bilby.core.prior.Uniform(100, 200, name="f1", latex_label="$f_1$")
+p1 = bilby.core.prior.Uniform(0.0, 2*np.pi, name="p1", latex_label="$\phi_1$", boundary="periodic")
+# ... add for a2, a3 ...
+```
+
+### 3. Run Simulation
+
+Create a `tutorial.yaml` and run:
+
+```bash
+uv run python src/pythiabns/spine.py tutorial.yaml
+```
+
+### 4. Results
+
+Inference on 3 sine waves demonstrates excellent parameter recovery:
+
+![Corner Plot](results/tutorial/BAM:0088:R01_three_sines_100.0/corner_plot.png)
+
+## 📄 Citation
+
+If you use **PythiaBNS** in your research, please cite:
+
+```bibtex
+@article{g1qs-j74x,
+  title = {Robust and fast parameter estimation for gravitational waves from binary neutron star merger remnants},
+  author = {Vretinaris, Stamatis and Vretinaris, Georgios and Mermigkas, Christos and Karamanis, Minas and Stergioulas, Nikolaos},
+  journal = {Phys. Rev. D},
+  volume = {113},
+  issue = {2},
+  pages = {024012},
+  numpages = {19},
+  year = {2026},
+  month = {Jan},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevD.113.024012},
+  url = {https://link.aps.org/doi/10.1103/PhysRevD.113.024012}
+}
+```

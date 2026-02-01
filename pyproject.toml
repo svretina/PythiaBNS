@@ -19,13 +19,24 @@ dependencies = [
     "numpy (>=2.2.6)",
     "pandas (>=2.2.3)",
     "pocomc (>=1.2.6)",
+    "zeus-mcmc (>=2.5.4)",
+    "tempest-sampler (>=0.1.5)",
+    "numpyro (>=0.17.0)",
+    "jax (>=0.5.0)",
+    "jaxlib (>=0.5.0)",
+    "nutpie (>=0.14.3)",
+    "blackjax (>=1.2.5)",
+    "cmdstanpy (>=1.2.5)",
     "scipy (>=1.15.3)",
     "tqdm (>=4.67.1)",
     "bilby (>=2.5.1)",
     "pycbc (>=2.6.0)",
     "multiprocess (>=0.70.17)",
     "pydantic (>=2.12.5,<3.0.0)",
-    "pyyaml (>=6.0.3,<7.0.0)"
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "ipython>=9.9.0",
+    "corner>=2.2.3",
+    "pdoc>=16.0.0",
 ]
 
 [tool.poetry]
