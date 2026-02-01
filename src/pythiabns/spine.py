@@ -1,3 +1,8 @@
+import numpy as np
+import numpy.linalg as linalg
+if not hasattr(linalg, "linalg"):
+    linalg.linalg = linalg
+
 import argparse
 import logging
 from pathlib import Path
@@ -10,6 +15,12 @@ from pythiabns.detectors.network import DetectorNetwork
 from pythiabns.inference.priors import PriorFactory
 from pythiabns.inference.likelihood import PostMergerLikelihood
 from pythiabns.inference.samplers.pocomc import PocoMCWrapper
+from pythiabns.inference.samplers.zeus import ZeusWrapper
+from pythiabns.inference.samplers.tempest import TempestWrapper
+from pythiabns.inference.samplers.numpyro_sampler import NumPyroWrapper
+from pythiabns.inference.samplers.nutpie_sampler import NutpieWrapper
+from pythiabns.inference.samplers.blackjax_sampler import BlackJAXWrapper
+from pythiabns.inference.samplers.stan_sampler import StanWrapper
 
 # Ensure models are registered
 import pythiabns.models.waveforms 
@@ -145,6 +156,13 @@ def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
     # For now, let's assume we proceed to sampling assuming data is ready.
     network.set_data(noise=False) # Zero noise for testing
     
+    # 2.5 Inject Signal
+    if injection_parameters:
+        logger.info(f"Injecting signal with parameters: {injection_parameters}")
+        network.inject_signal(wg, injection_parameters)
+    else:
+        logger.warning("No injection parameters provided. Sampling from zero noise (or NR if implemented).")
+    
     # 3. Setup Priors
     priors = PriorFactory.create_priors(sim_config.priors, sim_config.model, nr_data.metadata_dict, sim_config.model_params)
     
@@ -157,6 +175,60 @@ def run_simulation(sim_config: config.SimulationConfig, base_outdir: Path):
     
     if sim_config.sampler.plugin == "pocomc":
         sampler = PocoMCWrapper(
+            likelihood, 
+            priors, 
+            outdir=outdir, 
+            label=sim_config.model,
+            settings=sim_config.sampler.settings
+        )
+        sampler.run()
+    elif sim_config.sampler.plugin == "zeus":
+        sampler = ZeusWrapper(
+            likelihood, 
+            priors, 
+            outdir=outdir, 
+            label=sim_config.model,
+            settings=sim_config.sampler.settings
+        )
+        sampler.run()
+    elif sim_config.sampler.plugin == "tempest":
+        sampler = TempestWrapper(
+            likelihood, 
+            priors, 
+            outdir=outdir, 
+            label=sim_config.model,
+            settings=sim_config.sampler.settings
+        )
+        sampler.run()
+    elif sim_config.sampler.plugin == "numpyro":
+        sampler = NumPyroWrapper(
+            likelihood, 
+            priors, 
+            outdir=outdir, 
+            label=sim_config.model,
+            settings=sim_config.sampler.settings
+        )
+        sampler.run()
+    elif sim_config.sampler.plugin == "nutpie":
+        sampler = NutpieWrapper(
+            likelihood, 
+            priors, 
+            outdir=outdir, 
+            label=sim_config.model,
+            settings=sim_config.sampler.settings
+        )
+        sampler.run()
+    elif sim_config.sampler.plugin == "blackjax":
+        sampler = BlackJAXWrapper(
+            likelihood, 
+            priors, 
+            outdir=outdir, 
+            label=sim_config.model,
+            settings=sim_config.sampler.settings
+        )
+        sampler.run()
+    elif sim_config.sampler.plugin == "stan":
+        sampler = StanWrapper(
             likelihood, 
             priors, 
             outdir=outdir, 

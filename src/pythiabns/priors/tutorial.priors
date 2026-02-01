@@ -1,0 +1,17 @@
+a1 = bilby.core.prior.Uniform(1e-23, 2e-22, name="a1", latex_label="$A_1$")
+f1 = bilby.core.prior.Uniform(100, 200, name="f1", latex_label="$f_1$")
+p1 = bilby.core.prior.Uniform(0.0, 2*np.pi, name="p1", latex_label="$\phi_1$", boundary="periodic")
+
+a2 = bilby.core.prior.Uniform(1e-23, 2e-22, name="a2", latex_label="$A_2$")
+f2 = bilby.core.prior.Uniform(300, 400, name="f2", latex_label="$f_2$")
+p2 = bilby.core.prior.Uniform(0.0, 2*np.pi, name="p2", latex_label="$\phi_2$", boundary="periodic")
+
+a3 = bilby.core.prior.Uniform(1e-23, 2e-22, name="a3", latex_label="$A_3$")
+f3 = bilby.core.prior.Uniform(500, 600, name="f3", latex_label="$f_3$")
+p3 = bilby.core.prior.Uniform(0.0, 2*np.pi, name="p3", latex_label="$\phi_3$", boundary="periodic")
+
+ra = 0.0
+dec = 0.0
+psi = 0.0
+geocent_time = 0.0
+t0 = 0.0

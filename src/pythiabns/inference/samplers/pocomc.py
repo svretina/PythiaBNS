@@ -31,7 +31,7 @@ class BilbyPocomcPrior:
                 self.keys.append(k)
         
         self.dim = len(self.keys)
-        # Sort keys to ensure consistency?
+        # Sort keys to ensure consistency
         self.keys.sort()
         
         # Precompute bounds

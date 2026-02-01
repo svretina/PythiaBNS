@@ -10,43 +10,50 @@ logger = logging.getLogger(__name__)
 # --- Conversion Functions ---
 
 def easter_conversion_3(parameters):
-    parameters["w01"] = parameters["w_peak"] + parameters["w_1"]
-    parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
-    parameters["f12"] = parameters["f_2"] / parameters['f_1']
-    parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
-    parameters["f12"] = parameters["f_2"] / parameters['f_1']
+    if "w_peak" in parameters and "w_1" in parameters:
+        parameters["w01"] = parameters["w_peak"] + parameters["w_1"]
+    if "f_1" in parameters and "f_peak" in parameters:
+        parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
+    if "f_2" in parameters and "f_1" in parameters:
+        parameters["f12"] = parameters["f_2"] / parameters['f_1']
     added_keys = ["w01", "f01", "f12"]
     return parameters, added_keys
 
 def easter_conversion_2(parameters):
-    parameters["f02"] = parameters["f_2"] / parameters["f_peak"]
-    parameters["f02"] = parameters["f_2"] / parameters["f_peak"]
+    if "f_2" in parameters and "f_peak" in parameters:
+        parameters["f02"] = parameters["f_2"] / parameters["f_peak"]
     added_keys = ["f02"]
     return parameters, added_keys
 
 def easter_reparam_conversion_3(parameters):
-    h_sum = (parameters["h_peak_c"] ** 2 + parameters["h_peak_s"] ** 2)
+    h_sum = (parameters.get("h_peak_c", 0) ** 2 + parameters.get("h_peak_s", 0) ** 2)
     # Avoid division by zero
     if h_sum == 0: h_sum = 1e-20
     
-    parameters["h01"] = (
-        (parameters["h_1_c"] ** 2 + parameters["h_1_s"] ** 2) / h_sum
-    )
+    if "h_1_c" in parameters and "h_1_s" in parameters:
+        parameters["h01"] = (
+            (parameters["h_1_c"] ** 2 + parameters["h_1_s"] ** 2) / h_sum
+        )
     
-    h1_sum = (parameters["h_1_c"] ** 2 + parameters["h_2_s"] ** 2) # Typo in original? h_2_s or h_1_s? Original had h_1_c**2 + h_2_s**2. Keeping original.
+    h1_sum = (parameters.get("h_1_c", 0) ** 2 + parameters.get("h_2_s", 0) ** 2)
     if h1_sum == 0: h1_sum = 1e-20
     
-    parameters["h12"] = (
-        (parameters["h_2_c"] ** 2 + parameters["h_2_s"] ** 2) / h1_sum
-    )   
-    parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
-    parameters["f12"] = parameters["f_2"] / parameters['f_1']
+    if "h_2_c" in parameters and "h_2_s" in parameters:
+        parameters["h12"] = (
+            (parameters["h_2_c"] ** 2 + parameters["h_2_s"] ** 2) / h1_sum
+        )   
+    if "f_1" in parameters and "f_peak" in parameters:
+        parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
+    if "f_2" in parameters and "f_1" in parameters:
+        parameters["f12"] = parameters["f_2"] / parameters['f_1']
     added_keys = ["h01", "h12", "f01", "f12"]
     return parameters, added_keys
 
 def general_conversion_3(parameters):
-    parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
-    parameters["f12"] = parameters["f_2"] / parameters['f_1']
+    if "f_1" in parameters and "f_peak" in parameters:
+        parameters["f01"] = parameters["f_1"] / parameters["f_peak"]
+    if "f_2" in parameters and "f_1" in parameters:
+        parameters["f12"] = parameters["f_2"] / parameters['f_1']
     added_keys = ["f01", "f12"]
     return parameters, added_keys
 

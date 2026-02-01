@@ -52,7 +52,8 @@ class DetectorNetwork:
         """Inject signal into detectors."""
         self.ifos.inject_signal(
             waveform_generator=waveform_generator,
-            parameters=parameters
+            parameters=parameters,
+            raise_error=False
         )
 
     @property
