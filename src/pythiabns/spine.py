@@ -1,5 +1,6 @@
-import numpy.linalg as linalg
 from typing import Any
+
+import numpy.linalg as linalg
 
 if not hasattr(linalg, "linalg"):
     linalg.linalg = linalg  # type: ignore

@@ -3,13 +3,13 @@ import sys
 sys.path.append("/home/gvretinaris/Desktop/post_merger_bilby")
 
 import os
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 from post_merger_bilby import NR_strains as nr
 from post_merger_bilby import config
 from scipy.interpolate import CubicSpline as spline
-from typing import Any
 
 rcparams: dict[str, Any] = {}
 rcparams["axes.linewidth"] = 0.5
