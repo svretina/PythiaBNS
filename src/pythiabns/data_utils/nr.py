@@ -148,7 +148,7 @@ class NumericalWaveform:
 
     def _load_metadata(self, path: Path) -> dict[str, Any]:
         meta_file = path / "metadata.txt"
-        meta = {}
+        meta: dict[str, Any] = {}
         if not meta_file.exists():
             return meta
 
@@ -161,11 +161,12 @@ class NumericalWaveform:
                     break  # Stop reading
                 if "id_" in parts[0]:
                     key = parts[0]
-                    val = parts[-1]
+                    raw_val = parts[-1]
+                    val: Any = None
                     try:
-                        val = float(val)
+                        val = float(raw_val)
                     except ValueError:
-                        pass
+                        val = raw_val
                     meta[key] = val
         return meta
 

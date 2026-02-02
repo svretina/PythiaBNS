@@ -17,7 +17,7 @@ class PriorFactory:
         config: PriorConfig,
         model_name: str,
         metadata: dict[str, Any] | None = None,
-        model_params: dict[str, Any] = None,
+        model_params: dict[str, Any] | None = None,
     ) -> bilby.core.prior.PriorDict:
         # Fetch conversion function from registry
         reg_meta = registry.ModelRegistry.get_metadata(model_name, **(model_params or {}))

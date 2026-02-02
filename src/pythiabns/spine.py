@@ -1,7 +1,8 @@
 import numpy.linalg as linalg
+from typing import Any
 
 if not hasattr(linalg, "linalg"):
-    linalg.linalg = linalg
+    linalg.linalg = linalg  # type: ignore
 
 import argparse
 import logging
@@ -129,6 +130,8 @@ def run_simulation(sim_config: config.SimulationConfig, plot_config: config.Plot
     if inj.mode in ["nr", "file"]:
         try:
             # NumericalWaveform should be updated to handle paths
+            if inj.target is None:
+                raise ValueError("Injection target must be provided for 'nr' or 'file' mode.")
             nr_data = NumericalWaveform(inj.target)
         except Exception as e:
             logger.error(f"Failed to load injection waveform {inj.target}: {e}")
@@ -214,7 +217,7 @@ def run_simulation(sim_config: config.SimulationConfig, plot_config: config.Plot
     # 8. Run Sampler
     # Use passed outdir
 
-    sampler = None
+    sampler: Any = None
     if sim_config.sampler.plugin == "pocomc":
         sampler = PocoMCWrapper(
             likelihood, priors, outdir=outdir, label=sim_config.model, settings=sim_config.sampler.settings

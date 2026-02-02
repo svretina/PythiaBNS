@@ -21,7 +21,7 @@ class BlackJAXWrapper:
         priors: bilby.core.prior.PriorDict,
         outdir: Path,
         label: str,
-        settings: dict[str, Any] = None,
+        settings: dict[str, Any] | None = None,
     ):
         self.likelihood = likelihood
         self.priors = priors

@@ -9,8 +9,9 @@ import numpy as np
 from post_merger_bilby import NR_strains as nr
 from post_merger_bilby import config
 from scipy.interpolate import CubicSpline as spline
+from typing import Any
 
-rcparams = {}
+rcparams: dict[str, Any] = {}
 rcparams["axes.linewidth"] = 0.5
 rcparams["font.family"] = "serif"
 rcparams["font.size"] = 12
